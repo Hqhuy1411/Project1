@@ -1,0 +1,116 @@
+#include <iostream>
+using namespace std;
+template <typename T> class Vecto {
+    int n; //số chiều của vecto
+    T *data; //mảng động chứa tọa độ của vecto
+ //   static int count;//thành viên tĩnh dùng chung cho tất cả các đối tượng thuộc lớp
+public:
+    Vecto(int size = 3);//default constructor
+    Vecto( Vecto<T> &x);//copy constructor để thực hiện sao chép "sâu"
+    ~Vecto(); //destructor: không có đối số, ko có kiểu tra về =>không thể đa năng hóa hủy
+    void Nhap();
+    void Xuat() ;
+    friend istream &operator >>(istream &in, Vecto<T> &x);
+    friend ostream &operator <<(ostream &out,  Vecto<T> &x);
+    //a = b = c
+    // đề tránh việc thực hiện  (a = b) = c thì hàm trả về là 01 tham chiếu hằng
+    const Vecto &operator = (const Vecto<T> &x);
+    //a[i]: hàm thành viên, toán tử 2 ngôi có 01 tham số 
+    int &operator [] (int i) ;
+    friend void Display( Vecto<T> &x);//hiện thị tọa độ của vecto
+};
+//int Vecto::count = 0; //khai báo và cấp phát vùng nhớ cho thành viên tĩnh count
+template <typename T> 
+Vecto<T>::Vecto(int size):n(size),data(new T [n]){
+    // n = size;
+    // data = new int [n];
+}
+void Vecto<T>::Nhap(){
+    for(int i=0; i<n; i++){
+        cout<<"Nhap toa do thu "<<i<<":";
+        cin>>this->data[i];
+    }
+}
+template <typename T> 
+void Vecto<T>::Xuat()  {
+    for(int i=0; i<n; i++) 
+        cout<<data[i]<<" ";
+    cout<<endl;
+}
+//Hàm dựng sao chép: tham số bắt buộc phải là tham chiếu, thuộc lớp 
+//đang định nghĩa, đảm bảo tham chiếu không bị thay đổi thì dùng const
+template <typename T> 
+Vecto<T>::Vecto( Vecto<T> &x):n(x.n){
+    // this->n = x.n;
+    // data = x.data; //sao chép "nông"
+    this->data = new int [n];
+    for(int i=0; i<n; i++)
+        this->data[i] = x.data[i]; //sao chép sâu
+}
+
+template <typename T> 
+Vecto<T>::~Vecto(){
+    cout<<"Đang gọi hàm hủy"<<endl;
+    delete [] data; //thu hồi vùng nhớ mà data đang chứa địa chỉ
+}
+template <typename T> 
+void Display(const Vecto<T> &x){
+    for(int i=0;i<x.n;i++){
+        cout<<x.data[i]<<" ";
+    }
+    cout<<endl;
+}
+//cin>>x
+template <typename T> 
+istream &operator >>(istream &in, Vecto<T> &x){
+    for(int i = 0; i<x.n; i++){
+        cout<<"Toa do thu "<<i<< " : ";
+        in>>x.operator [] (i); //
+    }
+    return in;
+}
+template <typename T> 
+int &Vecto<T>::operator [] (int i) {
+    return data[i];
+}
+//cout<<x
+template <typename T> 
+ostream &operator <<(ostream &out,  Vecto<T> &x){
+    for(int i=0;i < x.n;i++){
+        out<<x[i]<<" ";
+    }
+    out<<endl;
+    return out;
+}
+template <typename T> 
+ Vecto<T> &Vecto::operator = ( Vecto &x){
+    if (this != &x) {
+        n = x.n;
+        delete [] data;
+        data = new int [n];
+        for (int i = 0; i<n; i++)
+            this->data[i] = x[i]; //sao chép giá trị
+    }
+    return *this;
+}
+int main()
+{
+    Vecto <int> a; 
+    cin >> a; 
+    cout << a;
+    Vecto<int> b = a;
+    cout <<b;
+    // Vecto a;//
+    // cout<<"Nhập vecto a: "<<endl;
+    // cin>>a;
+ 
+    // Vecto b;
+    // b = a; //phép gán
+    // cout<<"Nhập vecto b: "<<endl;
+    // cin>>b;
+    // cout<<"Vecto a:"<<a;
+    // cout<<"Vecto b:"<<b;
+   
+    // Display(a);
+    return 0;
+}
